@@ -3,3 +3,237 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+Work breakdown: - Bohdan Zasymovych: Task 3
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+id <- 22
+n <- id
+set.seed(id)
+
+a_k <- 1:150
+
+
+func <- function(k) {
+    full_value <- k * log(k^2 * n + pi)
+    fractional_part <- full_value - floor(full_value)
+
+    return(fractional_part)
+}
+
+
+x <- sapply(a_k[1:100], func)
+x <- qnorm(x)
+y <- sapply(a_k[101:150], func)
+y <- qnorm(y)
+```
+
+# Task 3
+
+## Idea behind KS test
+
+Kolmogorov-Smirnov (KS) test is a test which is used to check whether the probability distributions of a sample and a control distribution, or two samples are equal. It is constructed based on the cumulative distribution function (CDF) and calculates the greatest difference between the empirical cumulative distribution function (ECDF) of the sample and the theoretical or empirical distribution of the control sample.
+
+The Kolmogorov-Smirnov test is mostly used for two purposes:\
+- One-sample KS test: To compare the sample distribution to a known reference distribution.\
+- Two-sample KS test: To compare the two independent samples' distributions.
+
+**Hypotheses:**
+
+$$
+H_0: F_X = F\newline
+H_1: F_X \ne F
+$$
+
+**Test statistic:**
+
+$$
+D = \sup_{t \in R}|F_X(t) - F(t)|
+$$
+
+Where:\
+- $F_X(t)$ - ECDF of given sample\
+- $F(t)$ - CDF of control distribution for one-sample test or ECDF of the second sample for two-sample test
+
+Test statistic follows Kolmogorov distribution
+
+By LLN ECDF becomes close to true CDF so under $H_0$ realizations of test statistic should take small values.
+
+**Critical region of level** $\alpha$:\
+$$
+C_\alpha = \left\{ \textbf{x} \in R^n | d \ge d_{1-\alpha} \right\}
+$$
+
+Where:\
+- $d$ - realization of r. v. $D$\
+- $d_{1-\alpha}$ - quantile of Kolmogorov distribution of level $1-\alpha$
+
+**p-value:**
+
+$$
+p(\textbf{x}) = 1 - F_D(d)
+$$
+
+Where $F_D$ is CDF of Kolmogorov distribution
+
+## Tests
+
+### (a)
+
+Test whether $\{x_k\}_{k=1}^{100}$ are normally distributed (with parameters calculated from the sample)
+
+$$
+H_0: F = F_{\mathcal{N} ( \bar{\textbf{x}}, s^2)} \newline
+H_1: F \ne F_{\mathcal{N} ( \bar{\textbf{x}}, s^2)}
+$$
+
+```{r}
+sample_mean <- mean(x)
+sample_sd <- sd(x)
+ks_norm_result <- ks.test(x, "pnorm", mean=sample_mean, sd=sample_sd)
+
+print(ks_norm_result)
+```
+
+```{r}
+data_x <- data.frame(Value = x)
+
+ecdf_vs_cdf_plot <- ggplot(data_x, aes(x = Value)) +
+  
+  stat_ecdf(
+    aes(color = "Sample ECDF"), 
+    geom = "step", 
+    linewidth = 1.2
+  ) +
+
+  stat_function(
+    aes(color = "Theoretical CDF"), 
+    fun = pnorm, 
+    args = list(mean=sample_mean, sd=sample_sd),
+    linewidth = 1
+  ) +
+  
+  labs(
+    title = paste("Sample ECDF vs. Normal(", round(sample_mean, 4), ",", round(sample_sd**2, 4), ") CDF"),
+    x = "Observed Value (x)",
+    y = "CDF (F(x))",
+    color = "Function"
+  ) +
+  scale_color_manual(values = c("Sample ECDF" = "blue", "Theoretical CDF" = "red")) +
+  theme_minimal()
+
+ecdf_vs_cdf_plot
+```
+
+**Conclusion:**\
+p-value of a test is $\approx 0.61$, it is greater than desired significance level $\alpha = 0.05$, so $H_0$ is not rejected.
+
+### (b)
+
+Test whether $\{|x_k|\}_{k=1}^{100}$ are exponentially distributed with $\lambda = 1$;
+
+$$
+H_0: F = F_{\mathcal{E}(1)} \newline
+H_1: F \ne F_{\mathcal{E}(1)}
+$$
+
+```{r}
+lambda <- 1
+x_abs <- abs(x)
+ks_exp_result <- ks.test(x_abs, "pexp", rate=lambda)
+
+print(ks_exp_result)
+```
+
+```{r}
+data_x <- data.frame(Value = x_abs)
+
+ecdf_vs_cdf_plot <- ggplot(data_x, aes(x = Value)) +
+  
+  stat_ecdf(
+    aes(color = "Sample ECDF"), 
+    geom = "step", 
+    linewidth = 1.2
+  ) +
+
+  stat_function(
+    aes(color = "Theoretical CDF"), 
+    fun = pexp, 
+    args = list(rate=lambda),
+    linewidth = 1
+  ) +
+  
+  labs(
+    title = paste("Sample ECDF vs. Exp(", lambda, ") CDF"),
+    x = "Observed Value (x)",
+    y = "CDF (F(x))",
+    color = "Function"
+  ) +
+  scale_color_manual(values = c("Sample ECDF" = "blue", "Theoretical CDF" = "red")) +
+  theme_minimal()
+
+ecdf_vs_cdf_plot
+```
+
+**Conclusion:**\
+p-value of a test is $\approx 0.07$, it is greater than desired significance level $\alpha = 0.05$, so $H_0$ is not rejected.
+
+### (c)
+
+Test whether $\{x_k\}_{k=1}^{100}$ and $\{y_l\}_{l=1}^{50}$ have the same distributions.
+
+$$
+H_0: F_X = F_Y \newline
+H_1: F_X \neq F_Y
+$$
+
+```{r}
+ks_two_sample_result <- ks.test(x, y)
+
+print(ks_two_sample_result)
+```
+
+```{r}
+data_combined <- data.frame(
+  Value = c(x, y),
+  Group = factor(c(rep("x", length(x)),
+                   rep("y", length(y))))
+)
+
+ecdf_comparison_plot <- ggplot(data_combined, aes(x = Value, color = Group)) +
+  
+  stat_ecdf(
+    geom = "step",
+    linewidth = 1.2
+  ) +
+  
+  labs(
+    title = "sample ECDF (x) vs. sample ECDF (y)",
+    x = "Observed Value",
+    y = "ECDF (F(x))",
+    color = "Data Sample"
+  ) +
+
+  scale_color_manual(values = c("x" = "blue", 
+                               "y" = "red")) +
+  theme_minimal()
+
+
+ecdf_comparison_plot
+```
+
+**Conclusion:**\
+p-value of a test is $\approx 0.43$, it is greater than desired significance level $\alpha = 0.05$, so $H_0$ is not rejected.
+
+## Results
+
+3 hypothesis were tested for all of them $H_0$ was not rejected
+
+Samples were formed such that values drawn from the uniform distribution with parameters 0 and 1 were input into the inverse CDF of the standard normal distribution ($\Phi^{-1}$); thus, the samples had a distribution close to standard normal. Because of this, for the test in subtask (a), the result that $H_0$ is not rejected was expected. The same applies to the test in subtask (c): both samples have approximately the same distribution, close to standard normal.
+
+In subtask (b), $H_0$ is not true but was not rejected, so a Type II error occurred. This happened because the sample size was not large enough and the approximation was not accurate enough. When we increased the sample sizes, the $H_0$ hypothesis in subtasks (a) and (c) was not rejected, and the p-values were significantly greater than the desired significance level $\alpha = 0.05$. In subtask (b), for larger samples, the p-value became much less than $0.05$, and $H_0$ was rejected. Thus, increasing the sample size increases the accuracy of the test.
+
+In subtask (a) distribution of the sample was tested against the normal distribution with parameters obtained from the same sample. KS test is designed to test such that distribution equality to which is tested should not be dependent on sample, so in this case small bias towards equality of distributions may occur.
