@@ -39,7 +39,7 @@ y <- qnorm(y)
 
 ## Theoretical derivation
 
-### Lemma
+### Lemma 1
 
 Before the actual derivation we will need some equalities:
 
@@ -69,40 +69,56 @@ $$
 
 To make r.h.s of the equality have the same distribution as the l.h.s we need:
 
-$$\sum_{k=1}^n(\frac{X_k - \overline{\mathbf{X}}}{\sigma_x})^2  = \frac{S_\mathbf{xx}}{\sigma_x^2}\sim \chi^2_{n-1}$$
+$$
+\sum_{k=1}^n(\frac{X_k - \overline{\mathbf{X}}}{\sigma_x})^2  = \frac{S_\mathbf{xx}}{\sigma_x^2}\sim \chi^2_{n-1}
+$$
 
 In the same way we can show that $\frac{S_\mathbf{yy}}{\sigma_y^2}\sim \chi^2_{m-1}$.
+
+### Lemma 2
+
+Since samples $\mathbf{X}$ and $\mathbf{Y}$ are independent, then $\frac{S_\mathbf{xx}}{\sigma_x^2}$ and $\frac{S_\mathbf{yy}}{\sigma_y^2}$ are independent random variables with Chi-squared distributions.
+
+Remember the definition of Fisher distribution with $d_1$ and $d_2$ degrees of freedom:
+
+$$
+\mathcal{F}^{d_1}_{d_2} = \frac{U_1/d_1}{U_2/d_2} \qquad U_1\sim\chi^2_{d_1} \qquad U_2\sim\chi^2_{d_2} \qquad U_1\ \text{and}\ U_2\ \text{independent}
+$$
+
+Thus from lemma 1 we conclude that
+
+$$
+\Big[\frac{S_{\mathbf{xx}}/(n-1)}{S_{\mathbf{yy}}/(m-1)} \mid \sigma_x^2=\sigma_y^2\Big] = \frac{S_{\mathbf{xx}}\sigma_y^2(m-1)}{\sigma_x^2S_{\mathbf{yy}}(n-1)} \sim \mathcal{F}^{n-1}_{m-1}
+$$
 
 ### Derivation
 
 Our hypothesis is: $H_0: \sigma_x = \sigma_y\quad \text{v.s.}\quad H_1:\sigma_x\neq\sigma_y$.
 
+Denote f-statistic as follows:
+
+$$
+f(\mathbf{x}, \mathbf{y}) = \frac{S_{\mathbf{xx}}/(n-1)}{S_{\mathbf{yy}}/(m-1)}
+$$
+
 We have to build $C(\alpha) \subset \mathbb{R}^{n}\times\mathbb{R}^{m}$ s.t. $P((\mathbf{x}, \mathbf{y}) \in C(\alpha)\mid H_0) \leq \alpha$.
 
-Note that:
+We can use the lemma 2 here:
 
 $$
-\frac{S_{\mathbf{xx}}}{S_{\mathbf{yy}}} \mid  H_0 = \frac{S_{\mathbf{xx}}\sigma_y^2}{\sigma_x^2S_{\mathbf{yy}}} \sim \mathcal{F}^{n-1}_{m-1}
-$$
-
-Where $\mathcal{F}^{n-1}_{m-1}$ is a Fisher distribution with $n-1$ and $m-1$ degrees of freedom.
-
-We can use the fact that:
-
-$$
-P(\frac{S_{\mathbf{xx}}}{S_{\mathbf{yy}}} \in \big[\mathcal{F}^{n-1,m-1}_{\alpha/2}, \mathcal{F}^{n-1,m-1}_{1-\alpha/2}\big] \mid  H_0) = 1-\alpha
+P(f(\mathbf{x}, \mathbf{y}) \in \big[\mathcal{F}^{n-1,m-1}_{\alpha/2}, \mathcal{F}^{n-1,m-1}_{1-\alpha/2}\big] \mid  H_0) = 1-\alpha
 $$
 
 Equivalently:
 
 $$
-P(\frac{S_{\mathbf{xx}}}{S_{\mathbf{yy}}} \notin \big[\mathcal{F}^{n-1,m-1}_{\alpha/2}, \mathcal{F}^{n-1,m-1}_{1-\alpha/2}\big] \mid  H_0) = \alpha
+P(f(\mathbf{x}, \mathbf{y}) \notin \big[\mathcal{F}^{n-1,m-1}_{\alpha/2}, \mathcal{F}^{n-1,m-1}_{1-\alpha/2}\big] \mid  H_0) = \alpha
 $$
 
 So critical region is:
 
 $$
-C(\alpha) = \{(\mathbf{x}, \mathbf{y}) \in \mathbb{R}^n\times\mathbb{R}^m \mid \frac{S_{\mathbf{xx}}}{S_{\mathbf{yy}}} \notin \big[\mathcal{F}^{n-1,m-1}_{\alpha/2}, \mathcal{F}^{n-1,m-1}_{1-\alpha/2}\big]\}
+C(\alpha) = \{(\mathbf{x}, \mathbf{y}) \in \mathbb{R}^n\times\mathbb{R}^m \mid f(\mathbf{x}, \mathbf{y}) \notin \big[\mathcal{F}^{n-1,m-1}_{\alpha/2}, \mathcal{F}^{n-1,m-1}_{1-\alpha/2}\big]\}
 $$
 
 Minimizing the $\alpha$ given sample $(\mathbf{x}, \mathbf{y})$ we will get:
@@ -116,23 +132,23 @@ $$ This test is called f-test.
 As described above:
 
 $$
-C(0.05) = \{(\mathbf{x}, \mathbf{y}) \in \mathbb{R}^n\times\mathbb{R}^m \mid \frac{S_{\mathbf{xx}}}{S_{\mathbf{yy}}} \notin \big[\mathcal{F}^{n-1,m-1}_{0.025}, \mathcal{F}^{n-1,m-1}_{0.975}\big]\}
+C(0.05) = \{(\mathbf{x}, \mathbf{y}) \in \mathbb{R}^n\times\mathbb{R}^m \mid f(\mathbf{x}, \mathbf{y}) \notin \big[\mathcal{F}^{n-1,m-1}_{0.025}, \mathcal{F}^{n-1,m-1}_{0.975}\big]\}
 $$
 
 ```{r}
-v <- sum((x - mean(x))^2)/sum((y - mean(y))^2)
-print(sprintf("Statistic Sxx/Syy: %.6f", v))
+f <- (sum((x - mean(x))^2)/(length(x)-1))/(sum((y - mean(y))^2)/(length(y)-1))
+print(sprintf("Statistic f(x, y): %.6f", f))
 q1 <- qf(0.025, length(x)-1, length(y)-1)
 q2 <- qf(0.975, length(x)-1, length(y)-1)
 print(sprintf("Complement of rejection region for statistic: [%.6f, %.6f]", q1, q2))
 
-if(v < q1 || v > q2) {
+if(f < q1 || f > q2) {
   print("We reject the H0")
 } else {
   print("We do not reject the H0")
 }
 
-p <- 2*min(pf(v, length(x)-1, length(y)-1), 1-pf(v, length(x)-1, length(y)-1))
+p <- 2*min(pf(f, length(x)-1, length(y)-1), 1-pf(f, length(x)-1, length(y)-1))
 print(sprintf("p-value: %.6f", p))
 ```
 
@@ -142,7 +158,7 @@ var.test(x, y, alternative="two.sided")
 
 ## Conclusion
 
-So we can see that for the significance level of $0.05$ we reject $H_0$ and conclude that variances do differ. And actually our p-value is extremely small - we will reject the $H_0$ for very small values of $\alpha$. Thus we conclude that we **reject** the null hypothesis and we can say that variances of $Y$ and $X$ are different.
+So we can see that for the significance level of $0.05$ we **do not** reject $H_0$. Our p-value is pretty high - so we do not reject the $H_0$ for even larger values of $\alpha$. Thus we conclude that there is a possibility for variances of $Y$ and $X$ to be equal.
 
 # Task 3
 
