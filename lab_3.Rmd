@@ -123,14 +123,14 @@ $$
 To make r.h.s of the equality have the same distribution as the l.h.s we need:
 
 $$
-\sum_{k=1}^n(\frac{X_k - \overline{\mathbf{X}}}{\sigma_x})^2  = \frac{S_\mathbf{xx}}{\sigma_x^2}\sim \chi^2_{n-1}
+\sum_{k=1}^n(\frac{X_k - \overline{\mathbf{X}}}{\sigma_x})^2  = \frac{S_\mathbf{XX}}{\sigma_x^2}\sim \chi^2_{n-1}
 $$
 
-In the same way we can show that $\frac{S_\mathbf{yy}}{\sigma_y^2}\sim \chi^2_{m-1}$.
+In the same way we can show that $\frac{S_\mathbf{YY}}{\sigma_y^2}\sim \chi^2_{m-1}$.
 
 ### Lemma 2
 
-Since samples $\mathbf{X}$ and $\mathbf{Y}$ are independent, then $\frac{S_\mathbf{xx}}{\sigma_x^2}$ and $\frac{S_\mathbf{yy}}{\sigma_y^2}$ are independent random variables with Chi-squared distributions.
+Since samples $\mathbf{X}$ and $\mathbf{Y}$ are independent, then $\frac{S_\mathbf{XX}}{\sigma_x^2}$ and $\frac{S_\mathbf{YY}}{\sigma_y^2}$ are independent random variables with Chi-squared distributions.
 
 Remember the definition of Fisher distribution with $d_1$ and $d_2$ degrees of freedom:
 
@@ -141,7 +141,7 @@ $$
 Thus from lemma 1 we conclude that
 
 $$
-\Big[\frac{S_{\mathbf{xx}}/(n-1)}{S_{\mathbf{yy}}/(m-1)} \mid \sigma_x^2=\sigma_y^2\Big] = \frac{S_{\mathbf{xx}}\sigma_y^2(m-1)}{\sigma_x^2S_{\mathbf{yy}}(n-1)} \sim \mathcal{F}^{n-1}_{m-1}
+\Big[\frac{S_{\mathbf{XX}}/(n-1)}{S_{\mathbf{YY}}/(m-1)} \mid \sigma_x^2=\sigma_y^2\Big] = \frac{S_{\mathbf{XX}}\sigma_y^2(m-1)}{\sigma_x^2S_{\mathbf{YY}}(n-1)} \sim \mathcal{F}^{n-1}_{m-1}
 $$
 
 ### Derivation
@@ -159,13 +159,13 @@ We have to build $C(\alpha) \subset \mathbb{R}^{n}\times\mathbb{R}^{m}$ s.t. $P(
 We can use the lemma 2 here:
 
 $$
-P(f(\mathbf{x}, \mathbf{y}) \in \big[\mathcal{F}^{n-1,m-1}_{\alpha/2}, \mathcal{F}^{n-1,m-1}_{1-\alpha/2}\big] \mid  H_0) = 1-\alpha
+P(f(\mathbf{X}, \mathbf{Y}) \in \big[\mathcal{F}^{n-1,m-1}_{\alpha/2}, \mathcal{F}^{n-1,m-1}_{1-\alpha/2}\big] \mid  H_0) = 1-\alpha
 $$
 
 Equivalently:
 
 $$
-P(f(\mathbf{x}, \mathbf{y}) \notin \big[\mathcal{F}^{n-1,m-1}_{\alpha/2}, \mathcal{F}^{n-1,m-1}_{1-\alpha/2}\big] \mid  H_0) = \alpha
+P(f(\mathbf{X}, \mathbf{Y}) \notin \big[\mathcal{F}^{n-1,m-1}_{\alpha/2}, \mathcal{F}^{n-1,m-1}_{1-\alpha/2}\big] \mid  H_0) = \alpha
 $$
 
 So critical region is:
