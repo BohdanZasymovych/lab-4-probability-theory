@@ -5,6 +5,8 @@ output: html_notebook
 
 Work breakdown:
 
+-   Maxym Prokopetz: Task 1
+
 -   Bohdan Zasymovych: Task 3
 
 -   Andrii Kryvyi: Task 2 & 4
@@ -12,11 +14,45 @@ Work breakdown:
 ```{r}
 library(ggplot2)
 ```
+## Task 1
+
+### Hypotheses
+
+We have two samples:
+
+-   $X_1,\dots,X_{100} \sim \mathcal{N}(\mu_1, 1)$
+-   $Y_1,\dots,Y_{50} \sim \mathcal{N}(\mu_2, 1)$
+
+We test: $$
+H_0: \mu_1 = \mu_2
+\qquad\text{vs}\qquad
+H_1: \mu_1 \ne \mu_2
+$$
+
+Since the variances are known and fixed at $1$, the appropriate procedure is the two-sample z-test for the difference of means.
+
+### Test statistic
+
+$$
+Z = \frac{\bar{X} - \bar{Y}}{\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}
+$$
+
+Under the null hypothesis, $$
+Z \sim \mathcal{N}(0, 1).
+$$
+
+### Critical region (α = 0.05)
+
+$$
+C_{0.05} = \bigl\{\, |Z| > 1.96 \,\bigr\}.
+$$
+
+### R code
 
 ```{r}
-teamId <- 22
-n <- teamId
-set.seed(teamId)
+id <- 22
+n <- id
+set.seed(id)
 
 a_k <- 1:150
 
@@ -33,7 +69,23 @@ x <- sapply(a_k[1:100], func)
 x <- qnorm(x)
 y <- sapply(a_k[101:150], func)
 y <- qnorm(y)
+
+x_mean <- mean(x)
+y_mean <- mean(y)
+
+n1 <- length(x)
+n2 <- length(y)
+
+z_value <- (x_mean - y_mean) / sqrt(1/n1 + 1/n2)
+p_value <- 2 * (1 - pnorm(abs(z_value)))
+
+
+cat(z_value, p_value)
 ```
+
+### Conclusion
+
+The p-value (equal 0.53...) is greater than 0.05, and \|Z\| (equal 0.62...) is below 1.96. Therefore, we do not reject null hypothesis. The data do not provide statistical evidence that the means differ.
 
 # Task 2
 
