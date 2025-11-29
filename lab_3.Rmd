@@ -14,6 +14,7 @@ Work breakdown:
 ```{r}
 library(ggplot2)
 ```
+
 ## Task 1
 
 ### Hypotheses
@@ -437,7 +438,7 @@ y <- dataset$Marks
 plot(x, y, xlab="Study Time", ylab="Marks", col="red", pch=19)
 ```
 
-## Fitting model and result evaluation
+## Fitting model and results evaluation
 
 We are assuming that the data comes from the following distribution:
 
@@ -485,7 +486,7 @@ $$
 
 In our case we get that $r^2 = 0.8878$, this value is pretty high and we can conclude that the model fits well.
 
-### Testings significance
+### Testing significance
 
 To check whether study time is significant in predicting marks we can test whether we have a non-zero slope. If so, we will have some dependence of one variable on another. Formally our hypothesis is:
 
@@ -510,7 +511,7 @@ Therefore we can apply a t-test for that hypothesis.
 Our t-statistic will be:
 
 $$
-t = \frac{\hat{b}-0}{Var(\hat{b})} = \frac{\hat{b}}{\hat{\sigma}^2}S_\mathbf{xx} = \frac{\hat{b}}{\hat{R}}S_\mathbf{xx}(n-2)
+t = \frac{\hat{b}-0}{SE(\hat{b})} = \frac{\hat{b}}{\hat{\sigma}}\sqrt{S_\mathbf{xx}} = \frac{\hat{b}}{\sqrt{\hat{R}}}\sqrt{S_\mathbf{xx}(n-2)}
 $$
 
 The p-value is calculated as follows (since we are doing a two-sided version of the test):
