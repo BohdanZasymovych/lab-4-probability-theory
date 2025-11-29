@@ -177,7 +177,7 @@ $$
 Minimizing the $\alpha$ given sample $(\mathbf{x}, \mathbf{y})$ we will get:
 
 $$
-p = 2\min\{F_{\mathcal{F}^{n-1}_{m-1}}(\frac{S_\mathbf{xx}}{S_\mathbf{yy}}), 1-F_{\mathcal{F}^{n-1}_{m-1}}(\frac{S_\mathbf{xx}}{S_\mathbf{yy}})\}
+p = 2\min\{F_{\mathcal{F}^{n-1}_{m-1}}(f(\mathbf{x}, \mathbf{y})), 1-F_{\mathcal{F}^{n-1}_{m-1}}(f(\mathbf{x}, \mathbf{y}))\}
 $$ This test is called f-test.
 
 ## Rejection region for the significance level 0.05 and p-value
