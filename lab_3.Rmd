@@ -483,3 +483,7 @@ summary(model)
 ```
 
 We can see that the determination coefficient grew: instead of 89% of variance we can now explain 96% - the model fits very well.
+
+## Conclusions
+
+After fitting a linear model to data, checking determination coefficient and performing a t-test on the scale parameter we conclude that data has some linear nature and grade does depend on study time. Yet still there is some non-linearity, because model $y = a+bx+cx^2$ performs even better than $y = a+bx$.
