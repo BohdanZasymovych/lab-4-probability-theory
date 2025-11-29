@@ -154,7 +154,7 @@ $$
 f(\mathbf{x}, \mathbf{y}) = \frac{S_{\mathbf{xx}}/(n-1)}{S_{\mathbf{yy}}/(m-1)}
 $$
 
-We have to build $C(\alpha) \subset \mathbb{R}^{n}\times\mathbb{R}^{m}$ s.t. $P((\mathbf{x}, \mathbf{y}) \in C(\alpha)\mid H_0) \leq \alpha$.
+We have to build $C(\alpha) \subset \mathbb{R}^{n}\times\mathbb{R}^{m}$ s.t. $P((\mathbf{X}, \mathbf{Y}) \in C(\alpha)\mid H_0) \leq \alpha$.
 
 We can use the lemma 2 here:
 
