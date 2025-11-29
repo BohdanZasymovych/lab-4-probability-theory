@@ -1,18 +1,22 @@
 ---
-title: "R Notebook"
+title: "Lab 4"
 output: html_notebook
 ---
 
-Work breakdown: - Bohdan Zasymovych: Task 3
+Work breakdown:
+
+-   Bohdan Zasymovych: Task 3
+
+-   Andrii Kryvyi: Task 2 & 4
 
 ```{r}
 library(ggplot2)
 ```
 
 ```{r}
-id <- 22
-n <- id
-set.seed(id)
+teamId <- 22
+n <- teamId
+set.seed(teamId)
 
 a_k <- 1:150
 
@@ -237,3 +241,104 @@ Samples were formed such that values drawn from the uniform distribution with pa
 In subtask (b), $H_0$ is not true but was not rejected, so a Type II error occurred. This happened because the sample size was not large enough and the approximation was not accurate enough. When we increased the sample sizes, the $H_0$ hypothesis in subtasks (a) and (c) was not rejected, and the p-values were significantly greater than the desired significance level $\alpha = 0.05$. In subtask (b), for larger samples, the p-value became much less than $0.05$, and $H_0$ was rejected. Thus, increasing the sample size increases the accuracy of the test.
 
 In subtask (a) distribution of the sample was tested against the normal distribution with parameters obtained from the same sample. KS test is designed to test such that distribution equality to which is tested should not be dependent on sample, so in this case small bias towards equality of distributions may occur.
+
+# Task 4
+
+## Reading dataset
+
+```{r}
+dataset <- read.csv("data.csv")
+dataset
+```
+
+## Scatter plot
+
+```{r}
+x <- dataset$time_study
+y <- dataset$Marks
+
+plot(x, y, xlab="Study Time", ylab="Marks", col="red", pch=19)
+```
+
+## Fitting model and result evaluation
+
+We are assuming that the data comes from the following distribution: $$
+Y_k = a + bx_k + \varepsilon_k, \qquad \varepsilon_k \sim \mathcal{N}(0, \sigma^2)\ \text{i.i.d.}
+$$ We have fixed $\mathbf{x}$ and sample $\mathbf{Y}$ and $3$ parameters: $a$, $b$ and $\sigma^2$. We can use MLE to estimate them. The MLE will be equivalent to the OLS estimator, which we can get by minimizing the function: $$
+R = \sum_{k=1}^n(Y_k-a-bx_k)^2
+$$ Minimizing this function via calculus, we will get the following results: $$
+\hat{a} = \overline{\mathbf{Y}}-\hat{b}\overline{\mathbf{x}} \qquad \hat{b} = \frac{S_\mathbf{xY}}{S_\mathbf{xx}} = \frac{\sum_{k=1}^n(x_k-\overline{\mathbf{x}})(Y_k - \overline{\mathbf{Y}})}{\sum_{k=1}^n(x_k-\overline{\mathbf{x}})^2}\\
+\qquad \hat{\sigma}^2 = \frac{\hat{R}}{n-2} = \frac{1}{n-2}\sum_{k=1}^n(Y_k-\hat{a}-\hat{b}x_k)^2
+$$ As a result we will have a following fitted model: $$
+\hat{y}(x) = \hat{a} + \hat{b}x
+$$
+
+```{r}
+model <- lm(y ~ x)
+
+plot(x, y, xlab="Study Time", ylab="Marks", col="red", pch=19)
+abline(model, col="blue", lwd=2)
+```
+
+```{r}
+summary(model)
+```
+
+### Goodness-of-fit
+
+To evaluate the goodness-of-fit we can use the determination coefficient which gives us a percentage of variance in our original data that is explained by the fitted model: $$
+r^2 = 1 - \frac{\sum_{k=1}^n(Y_k-\hat{y}(x_k))^2}{\sum_{k=1}^n(Y_k-\overline{\mathbf{Y}})^2}
+$$
+
+In our case we get that $r^2 = 0.8878$, this value is pretty high and we can conclude that the model fits well.
+
+### Testings significance
+
+To check whether study time is significant in predicting marks we can test whether we have a non-zero slope. If so, we will have some dependence of one variable on another. Formally our hypothesis is: $$
+H_0: b = 0 \quad \text{v.s.} \quad H_1: b \neq 0
+$$ Recap the formula for $\hat{b}$: $$
+\hat{b} = \frac{\sum_{k=1}^n(x_k-\overline{\mathbf{x}})(Y_k - \overline{\mathbf{Y}})}{\sum_{k=1}^n(x_k-\overline{\mathbf{x}})^2}
+$$ We can see that the estimator linearly depends on a sample $Y_k$. Since all $Y_k$ are i.i.d. r.v. with a normal distribution, $\hat{b}$ is also a r.v. with a normal distribution: $$
+\hat{b} \sim \mathcal{N}(b, \frac{\sigma^2}{S_\mathbf{xx}})
+$$
+
+Therefore we can apply a t-test for that hypothesis.
+
+Our t-statistic will be: $$
+t = \frac{\hat{b}-0}{Var(\hat{b})} = \frac{\hat{b}}{\hat{\sigma}^2}S_\mathbf{xx} = \frac{\hat{b}}{\hat{R}}S_\mathbf{xx}(n-2)
+$$ The p-value is calculated as follows (since we are doing a two-sided version of the test): $$
+p = 2F_{\mathcal{T}_{n-2}}(-|t|)
+$$
+
+From the summary of the model, we can see that the p-value for the t-test on the scale parameter is smaller than the value R is possible to calculate. This means that we can reject the null-hypothesis for very small alpha, thus we conclude that $b \neq 0$ and there is a dependence of grades over time of study.
+
+## Alice grade prediction
+
+```{r}
+alice.hours <- 8
+alice.marks <- predict.lm(model, data.frame(x=alice.hours))
+print(sprintf("ŷ(%.2f) = %.2f", alice.hours, alice.marks))
+```
+
+So for 8 hours of study we predict that Alice will have a grade of $46.7$.
+
+## Possible improvements
+
+### Improvement 1
+
+We can collect more data about students. This way we will have larger sample from $Y$ population, therefore as a consequence of law of large numbers predicted value will converge to theoretical mean.
+
+### Improvement 2
+
+Notice on the plot that our data is actually non-linear. We can see that it i s convex, because in the middle our model overestimates and on the boundaries it underestimates. We can fix it by including additional basis function, making our model polynomial. Yet we can still use linear regression on $\hat{y} = a + bx + cx^2$ with $a$, $b$ and $c$ as parameters.
+
+```{r}
+model <- lm(y ~ x + I(x^2))
+
+plot(x, y, xlab="Study Time", ylab="Marks", col="red", pch=19)
+curve(predict(model, newdata = data.frame(x = x)), 
+      add = TRUE, col = "blue", lwd = 2)
+summary(model)
+```
+
+We can see that the determination coefficient grew: instead of 89% of variance we can now explain 96% - the model fits very well.
